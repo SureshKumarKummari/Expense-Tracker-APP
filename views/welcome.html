@@ -6,91 +6,85 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-green-300">
-    <form onsubmit="handleFormSubmit(event)" class="max-w-lg mx-auto p-4">
-        <label for="expense" class="block">Choose Expense amount</label>
-        <input type="number" name="expense" id="expense"
-            class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+<body class="bg-info">
+    <h1>Expense Tracker APP </h1>
+    <div class="container justify-content-center">
+        <form onsubmit="handleFormSubmit(event)" class="row g-3">
+            <div class="col-md-4">
+                <input type="number" name="expense" id="expense" class="form-control" placeholder="Choose Expense amount" />
+            </div>
+        
+            <div class="col-md-4">
+                <input type="text" id="description" class="form-control" placeholder="Description" />
+            </div>
+        
+            <div class="col-md-3">
+                <select name="category" id="category" class="form-select" aria-label="Choose a category">
+                    <option selected>Choose a category</option>
+                    <option value="Food">Food</option>
+                    <option value="Fuel">Fuel</option>
+                    <option value="Movie">Movie</option>
+                    <option value="Electricity">Electricity</option>
+                </select>
+            </div>
+        
+            <div class="col-md-1">
+                <button class="btn btn-primary">Add Expense</button>
+            </div>
+        </form>
 
-        <label for="description" class="block mt-4">Description:</label>
-        <input type="text" id="description"
-            class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-
-        <label for="category" class="block mt-4">Choose a category:</label>
-        <select name="category" id="category"
-            class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            <option value="Food">Food</option>
-            <option value="Fuel">Fuel</option>
-            <option value="Movie">Movie</option>
-            <option value="Electricity">Electricity</option>
-        </select>
-
-        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Add Expense</button>
-    </form>
-
-    <ul class="ul"></ul>
-    <div id="response"></div>
-
-
-    <table id="table" class=" divide-y divide-gray-200 mx-auto mx-w-md">
-        <thead class="bg-gray-50">
-            <tr class="border-gray-300 rounded-md shadow-sm">
-                <th scope="col" class="border-gray-300 rounded-md shadow-sm px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase">
-                    Expense
-                </th>
-                <th scope="col" class="border-gray-300 rounded-md shadow-sm px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase">
-                    Category
-                </th>
-                <th scope="col" class="border-gray-300 rounded-md shadow-sm px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase">
-                    Description
-                </th>
+    </div>
+    <br><br>
+    <div class="container justify-content-center table-responsive" style="max-width:700px;">
+    <table id="table" class="table">
+        <thead class="thead-light bg-primary ">
+            <tr>
+                <th class="p-2 bg-primary rounded-start">Expense</th>
+                <th class="p-2 bg-primary">Category</th>
+                <th class="p-2 bg-primary">Description</th>
+                <th class="p-2 bg-primary rounded-end">Actions</th>
             </tr>
         </thead>
-        <tbody id="table-body" class="bg-white divide-y divide-gray-200">
-            
-        </tbody>
+        <tbody id="table-body"></tbody>
     </table>
-
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 <script>
-    var userId;
-    var data;
-    function getResponseData() {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const data = urlParams.get('data');
-        return data ? JSON.parse(decodeURIComponent(data)) : null;
-    }
-
-    function displayResponseData() {
-        const responseData = getResponseData();
-        if (responseData) {
-            data = JSON.parse(JSON.stringify(responseData));
-            userId = data.id;
-            //document.getElementById('response').innerHTML=`Welcome to The Expenses App ${data.username} and your is ${userId}`;
-        }
-    }
-
-    window.onload = function () {
-        displayResponseData();
-    };
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 
 
-
-
+<script>
+   
+    let token=localStorage.getItem('token');
     function handleFormSubmit(e) {
             e.preventDefault();
             let obj = {
                 expense: e.target.expense.value,
                 description: e.target.description.value,
                 category: e.target.category.value,
-                userId:userId
             }
-        axios.post('http://localhost:3000/addExpense', obj)
+        axios.post('http://localhost:3000/addExpense',obj, { headers: { "Autherization": token } })
             .then(response => {
                 
                 addTotable(response.data);
@@ -107,27 +101,142 @@
             const table = document.getElementById('table');
             const tbody = document.getElementById('table-body');
             const tr = document.createElement('tr');
-            tr.classList.add('border-gray-400');
             tr.innerHTML = `
-                    <td>${expense.expense}</td>
-                    <td>${expense.category}</td>
-                    <td>${expense.description}</td>
-                `;
+            <form onsubmit="return false;">
+                <td class="rounded-start">${expense.expense}</td>
+                <td>${expense.category}</td>
+                <td>${expense.description}</td>
+                <td class="rounded-end">
+                    <input type="hidden" name="id" value="${expense.id}">
+                <button class="btn btn-danger" onclick="deleteRow(event)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="btn btn-primary" onclick="editRow(event)" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                </td>
+            </form>`;
             tbody.appendChild(tr);
+
             table.appendChild(tbody);
         }
 
+//Handling Buttons 
+    function deleteRow(event) {
+        const row = event.target.closest('tr');
+        let id= row.querySelector('input[type="hidden"]').value;
+        console.log(id);
+        axios.delete(`http://localhost:3000/deleteExpense/${id}`, { headers: { "Autherization": token } }).then((result) => {
+            console.log("Expense Deleted!");
+            row.remove();
+        }).catch((error) => {
+            console.log(error);
+        })
 
-        
-            window.addEventListener('DOMContentLoaded', (e) => {
-                e.preventDefault();
-                axios.get("http://localhost:3000/getExpenses").then((response) => {
+
+    }
+
+
+    function editRow(event) {
+            const row = event.target.closest('tr'); // Find the closest table row
+
+            // Extract data from the row
+            const expense = row.cells[0].innerText.trim();
+            const category = row.cells[1].innerText.trim();
+            const description = row.cells[2].innerText.trim();
+            const hiddenInput = row.querySelector('input[type="hidden"]').value;
+
+            // Replace the row's innerHTML with empty strings
+            row.innerHTML = '';
+
+            // Create form elements for each cell and append them to the respective table cells
+            const td1 = document.createElement('td');
+            const expenseInput = createInputField('text', 'expense', expense);
+            td1.appendChild(expenseInput);
+            row.appendChild(td1);
+
+            const td2 = document.createElement('td');
+            const categoryInput = createInputField('text', 'category', category);
+            td2.appendChild(categoryInput);
+            row.appendChild(td2);
+
+            const td3 = document.createElement('td');
+            const descriptionInput = createInputField('text', 'description', description);
+            td3.appendChild(descriptionInput);
+            row.appendChild(td3);
+
+            const td4 = document.createElement('td');
+            const hiddenInputField = document.createElement('input');
+            hiddenInputField.type = 'hidden';
+            hiddenInputField.value = hiddenInput;
+            hiddenInputField.name = 'expenseId';
+            td4.appendChild(hiddenInputField);
+
+            // Append the Save button to the last cell
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.classList.add('btn', 'btn-primary');
+            saveButton.addEventListener('click', saveChanges);
+            td4.appendChild(saveButton);
+            row.appendChild(td4);
+        }
+
+        function createInputField(type, name, value) {
+            const input = document.createElement('input');
+            input.type = type;
+            input.name = name;
+            input.value = value;
+            input.classList.add('form-control'); // Add Bootstrap class for styling
+            return input;
+        }
+
+
+            function saveChanges(event) {
+                    // Prevent the form from submitting
+                    event.preventDefault();
+
+                    const form = event.target.closest('tr'); // Find the closest table row
+                    //console.log(form);
+                    // Extract data from the form
+                    const expense = form.querySelector('input[name="expense"]').value;
+                    console.log(expense);
+                    const category = form.querySelector('input[name="category"]').value;
+                    const description = form.querySelector('input[name="description"]').value;
+                    const expenseId = form.querySelector('input[name="expenseId"]').value;
+
+                    // Perform validation if needed
+
+                    // Send data to the server using Axios
+                    axios.put(`http://localhost:3000/updateExpense/${expenseId}`, {
+                        expense,
+                        category,
+                        description
+                    }, { headers: { "Autherization": token } })
+                        .then(response => {
+                            // Handle response as needed
+                            console.log('Expense updated successfully:', response.data);
+                            // Refresh the page or update the row in the table with the new data
+                            // For simplicity, you can reload the page
+                            location.reload();
+                        })
+                        .catch(error => {
+                            // Handle error
+                            console.error('Error updating expense:', error);
+                        });
+                }
+
+            function domload(){
+                axios.get(`http://localhost:3000/getExpenses`,{headers:{"Autherization":token}}).then((response) => {
                     
                      for (let i = 0; i < response.data.length; i++) {
                         addTotable(response.data[i]);
                         }
                 }).catch(err=>console.log(err));
-            });
+            }
+
+            window.onload = function () {
+                    domload();
+                };
 
 </script>
 

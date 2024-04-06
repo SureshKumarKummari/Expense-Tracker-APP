@@ -65,10 +65,14 @@
                             // `welcome.html?error=${encodeURIComponent(response.data)}`;
             axios.get(`http://localhost:3000/login/${email}/${password}`)
                     .then(response => {
-                        console.log(response.status);
+                       // console.log(response.status);
                            // window.location.href = 'welcome.html';
-                            window.location.href = `welcome.html?data=${encodeURIComponent(JSON.stringify(response.data))}`;
-                    })
+                           // window.location.href = `welcome.html?data=${encodeURIComponent(JSON.stringify(response.data))}`;
+                        //console.log(response.data.token);
+                        localStorage.setItem('token',response.data.token);
+                        window.location.href = 'welcome.html';
+
+                        })
                     .catch(error => {
                          displayErrorMessage('Invalid Credentials!');
                     });

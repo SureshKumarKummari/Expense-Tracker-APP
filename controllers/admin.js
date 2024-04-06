@@ -1,5 +1,6 @@
 const users=require('../models/users');
 const bcrypt=require('../util/bcryptpassword');
+const userauth=require('../middleware/userauthentication');
 
 exports.signup=async(req,res,next)=>{
     users.findOne({where:{email:req.body.email}})
@@ -24,6 +25,10 @@ exports.signup=async(req,res,next)=>{
 }
 
 
+function generateToken(id){
+    return userauth.token(id);
+}
+
 exports.login = (req, res, next) => {
     users.findOne({ where: { email: req.params.email } })
         .then(user => {
@@ -31,8 +36,9 @@ exports.login = (req, res, next) => {
                 bcrypt.checkpass(req.params.password, user.password)
                     .then(passwordMatch => {
                         if (passwordMatch) {
-                            console.log(user);
-                            res.status(200).send(user); // Send user data if passwords match
+                            //console.log(user);
+
+                            res.status(200).json({token:generateToken(user.id)}); // Send user data if passwords match
                         } else {
                             res.status(401).json({ error: 'Invalid Password!' }); // Unauthorized if passwords don't match
                         }
