@@ -9,5 +9,7 @@ router.get('/login/:email/:password',admin.login);
 
 router.post('/signup',admin.signup);
 
+router.get('/forgotPassword/:email',admin.forgotPassword);
+
 
 module.exports=router;

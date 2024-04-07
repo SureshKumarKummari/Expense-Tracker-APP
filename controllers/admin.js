@@ -1,6 +1,7 @@
 const users=require('../models/users');
 const bcrypt=require('../util/bcryptpassword');
 const userauth=require('../middleware/userauthentication');
+const sendEmail=require('../util/mailservice');
 
 exports.signup=async(req,res,next)=>{
     users.findOne({where:{email:req.body.email}})
@@ -55,3 +56,15 @@ exports.login = (req, res, next) => {
             res.status(500).json({ error: 'Internal Server Error' }); // Internal server error if something goes wrong
         });
 };
+
+
+
+
+exports.forgotPassword=async(req,res,next)=>{
+    await sendEmail.sendEmail(req.params.email)
+    .then(res=>{
+        res.status(200).json({message:"Mail sent successfully!"});
+    }).catch(err=>{
+        res.status(500).json({error:"Internal Server error!"});
+    })
+}

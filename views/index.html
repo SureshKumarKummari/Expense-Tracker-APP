@@ -49,6 +49,9 @@
                 <br>
                 <button type="submit" 
                     class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Login</button>
+                    <div>Forgot your password ?
+                        <button onclick="forgetPassword()" class="text-blue-500 hover:underline">Get password</button>
+                    </div>
             </form>
             <div>New User? 
             <button onclick="showForm('signup-form')" class="text-blue-500 hover:underline"> Signup</button>
@@ -57,6 +60,11 @@
     </div>
 
     <script>
+
+        //Handling forgot password to go to another page
+        function forgetPassword(){
+            window.location.href = 'forgotpassword.html';
+        }
 
             function handleLogin(event) {
                 event.preventDefault();
@@ -127,7 +135,8 @@
 
         showForm('signup-form');
     </script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">
+        </script>
 </body>
 
 </html>
