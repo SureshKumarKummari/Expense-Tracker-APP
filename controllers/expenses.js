@@ -27,7 +27,8 @@ exports.getLeaderbord = async (req, res, next) => {
             [Sequelize.fn('SUM', Sequelize.col('expense')), 'totalExpense']
                 ],
             include:[{model:expenseTable,attributes:[]}],
-            group:['id']
+            group:['id'],
+            order:[['totalExpense','DESC']]
         }).then(result=>{
             console.log(result);
             res.status(200).json(result);
