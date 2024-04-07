@@ -250,7 +250,8 @@
                         "handler": async function(response){
                             await axios.post('http://localhost:3000/transactionupdate',{
                                 order_id:options.order_id,
-                                payment_id:response.razorpay_payment_id},
+                                payment_id:response.razorpay_payment_id,
+                                status:"SUCCESSFUL"},
                                 { headers: { "Autherization": token } }
                             );
                             alert('you are premium member now!');
@@ -261,7 +262,14 @@
                     rzp.open();
                     e.preventDefault();
                     rzp.on('payment.failed',function(response){
-                        console.log(response);
+                        /* console.log(response);*/
+                        axios.post('http://localhost:3000/transactionupdate', {
+                            order_id: options.order_id,
+                            payment_id: response.razorpay_payment_id,
+                            status: "FAILED"
+                        },
+                            { headers: { "Autherization": token } }
+                        );
                         alert('Something went wrong!');
                     });
 

@@ -34,7 +34,7 @@ users.hasMany(orders);
 orders.belongsTo(users);
 
 
-sequelize.sync({force:true}).then(()=>{
+sequelize.sync().then(()=>{
 app.listen(3000,()=>{
     console.log("App listening on PORT 3000!")
 })
