@@ -20,6 +20,8 @@
 
 <body class="bg-info">
     <h1>Expense Tracker APP </h1>
+    <button type="button" id="premium"class="btn btn-success">Buy premium</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <div class="container justify-content-center">
         <form onsubmit="handleFormSubmit(event)" class="row g-3">
             <div class="col-md-4">
@@ -237,6 +239,35 @@
             window.onload = function () {
                     domload();
                 };
+
+
+                document.getElementById('premium').onclick=async()=>{
+                    const response=await axios.get('http://localhost:3000/premiummembership', { headers: { "Autherization": token } });
+                    console.log(response);
+                    var options={
+                        "key_id": response.data.key_id,
+                        "order_id":response.data.order.id,
+                        "handler": async function(response){
+                            await axios.post('http://localhost:3000/transactionupdate',{
+                                order_id:options.order_id,
+                                payment_id:response.razorpay_payment_id},
+                                { headers: { "Autherization": token } }
+                            );
+                            alert('you are premium member now!');
+                        }
+                    };
+                    console.log(options);
+                    const rzp=new Razorpay(options);
+                    rzp.open();
+                    e.preventDefault();
+                    rzp.on('payment.failed',function(response){
+                        console.log(response);
+                        alert('Something went wrong!');
+                    });
+
+                }
+                
+
 
 </script>
 
