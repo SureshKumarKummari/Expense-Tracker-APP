@@ -3,11 +3,15 @@ const sequelize=require('./util/database');
 const expenses=require('./models/expenses');
 const users=require('./models/users');
 const orders=require('./models/orders');
+const forgotpassword=require('./models/forgotpasswordrequests');
 
 //Routers
 const admin=require('./routes/admin');
 const handleexpenses=require('./routes/expenses');
 const purchase=require('./routes/purchase');
+
+//importing path 
+const path = require('path');
 
 const express = require('express');
 
@@ -16,6 +20,14 @@ const cors=require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
+
+//Adding ejs middleware and seting dirname views
+app.set('views', path.join(__dirname, 'views'));
+
+app.set('view engine', 'ejs');
+
+
+
 
 app.use(cors());
 
@@ -32,6 +44,9 @@ expenses.belongsTo(users);
 
 users.hasMany(orders);
 orders.belongsTo(users);
+
+users.hasMany(forgotpassword);
+forgotpassword.belongsTo(users);
 
 
 sequelize.sync().then(()=>{

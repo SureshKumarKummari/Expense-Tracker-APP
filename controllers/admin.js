@@ -1,7 +1,14 @@
-const users=require('../models/users');
+//utilities and middleware
 const bcrypt=require('../util/bcryptpassword');
 const userauth=require('../middleware/userauthentication');
 const sendEmail=require('../util/mailservice');
+
+//uuid for generating uuid
+const {v4: uuidv4}=require('uuid');
+
+//database models
+const users=require('../models/users');
+const forgot=require('../models/forgotpasswordrequests');
 
 exports.signup=async(req,res,next)=>{
     users.findOne({where:{email:req.body.email}})
@@ -60,11 +67,59 @@ exports.login = (req, res, next) => {
 
 
 
-exports.forgotPassword=async(req,res,next)=>{
-    await sendEmail.sendEmail(req.params.email)
-    .then(res=>{
-        res.status(200).json({message:"Mail sent successfully!"});
-    }).catch(err=>{
-        res.status(500).json({error:"Internal Server error!"});
-    })
+exports.forgotPassword = async (req, res, next) => {
+    try {
+        let email = req.params.email;
+        // Find the user by email
+        let user = await users.findOne({ where: { email: email } });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        // Generate a unique ID for the password reset request
+        let id = uuidv4();
+        console.log("calling id!",id);
+        // Create a new row in the 'forgot' table
+        let forgotRow = await forgot.create({
+            id: id,
+            userId: user.id,
+            isactive: true
+        });
+        let link = `http://localhost:3000/password/resetpassword/${id}`;
+
+        await sendEmail.sendEmail(email, link);
+
+        res.status(200).json({ message: "Mail sent successfully!" });
+    } catch (error) {
+        console.error("Error in forgotPassword:", error);
+        res.status(500).json({ error: "Internal Server error!" });
+    }
+};
+
+
+
+exports.resetPassword=(req,res,next)=>{
+    let id=req.params.id;
+    res.render('resetpassword',{id:id});
+}
+
+
+exports.updatePassword = async (req, res, next) => {
+    const { id, password } = req.body;
+    try {
+        const found = await forgot.findByPk(id);
+        const user = await users.findByPk(found.userId);
+        console.log()
+        await bcrypt.decrypt(password).then(pass=>{
+                console.log(pass);
+                user.password = pass;
+                user.save();
+        })
+        found.isactive = false;
+        await found.save();
+        res.status(200).json({ success: true, message: "Password updated Successfully!" });
+    } catch (err) {
+        console.error('Error updating password:', err);
+        res.status(500).json({ message: "Something went Wrong!" });
+    }
 }
