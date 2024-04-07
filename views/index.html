@@ -69,6 +69,7 @@
                            // window.location.href = 'welcome.html';
                            // window.location.href = `welcome.html?data=${encodeURIComponent(JSON.stringify(response.data))}`;
                         //console.log(response.data.token);
+                        localStorage.setItem('ispremium',response.data.ispremium);
                         localStorage.setItem('token',response.data.token);
                         window.location.href = 'welcome.html';
 
@@ -91,6 +92,7 @@
 
         // Function to switch between signup and login forms
         function showForm(formId) {
+            localStorage.clear();
             const forms = document.querySelectorAll('.form-container');
             forms.forEach(form => {
                 if (form.id === formId) {

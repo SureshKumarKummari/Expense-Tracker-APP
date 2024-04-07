@@ -12,60 +12,100 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
 
-
+    <!-- Razorpay JS script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
 
-<body class="bg-info">
-    <h1>Expense Tracker APP </h1>
-    <button type="button" id="premium"class="btn btn-success">Buy premium</button>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <div class="container justify-content-center">
-        <form onsubmit="handleFormSubmit(event)" class="row g-3">
-            <div class="col-md-4">
-                <input type="number" name="expense" id="expense" class="form-control" placeholder="Choose Expense amount" />
-            </div>
-        
-            <div class="col-md-4">
-                <input type="text" id="description" class="form-control" placeholder="Description" />
-            </div>
-        
-            <div class="col-md-3">
-                <select name="category" id="category" class="form-select" aria-label="Choose a category">
-                    <option selected>Choose a category</option>
-                    <option value="Food">Food</option>
-                    <option value="Fuel">Fuel</option>
-                    <option value="Movie">Movie</option>
-                    <option value="Electricity">Electricity</option>
-                </select>
-            </div>
-        
-            <div class="col-md-1">
-                <button class="btn btn-primary">Add Expense</button>
-            </div>
-        </form>
-
-    </div>
-    <br><br>
-    <div class="container justify-content-center table-responsive" style="max-width:700px;">
-    <table id="table" class="table">
-        <thead class="thead-light bg-primary ">
-            <tr>
-                <th class="p-2 bg-primary rounded-start">Expense</th>
-                <th class="p-2 bg-primary">Category</th>
-                <th class="p-2 bg-primary">Description</th>
-                <th class="p-2 bg-primary rounded-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-    </table>
-    </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+</head>
+
+<body class="bg-info">
+    <!-- Nav Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Expense Tracker App</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <button type="button" class="btn btn-link nav-link" id="premium">Buy premium</button>
+                </li>
+                <li class="nav-item">
+                    <div id="showMessage" class="nav-link">You are Premium member</div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <br><br>
+    <!-- Body -->
+
+<div class="container-fluid" style="height: 100vh;">
+    <div class="row" style="height: 100%;">
+        <div class="col-2 bg-primary border">
+            <h1>Filters</h1>
+
+        </div>
+        <div class="col-8">
+            <div class="row" style="height: 100%;">
+                <div class="col bg-secondary border">
+                    <h4>Add Expense details</h4>
+                    <div class="container justify-content-center">
+                        <form onsubmit="handleFormSubmit(event)" class="row g-3">
+                            <div class="col-md-4">
+                                <input type="number" name="expense" id="expense" class="form-control" placeholder="Choose Expense amount" />
+                            </div>
+                    
+                            <div class="col-md-4">
+                                <input type="text" id="description" class="form-control" placeholder="Description" />
+                            </div>
+                    
+                            <div class="col-md-3">
+                                <select name="category" id="category" class="form-select" aria-label="Choose a category">
+                                    <option selected>Choose a category</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Fuel">Fuel</option>
+                                    <option value="Movie">Movie</option>
+                                    <option value="Electricity">Electricity</option>
+                                </select>
+                            </div>
+                    
+                            <div class="col-md-1">
+                                <button class="btn btn-primary">Add Expense</button>
+                            </div>
+                        </form>
+                    </div>
+                    <br><br>
+                    <div class="container justify-content-center table-responsive" style="max-width:700px;">
+                        <table id="table" class="table">
+                            <thead class="thead-light bg-primary ">
+                                <tr>
+                                    <th class="p-2 bg-primary rounded-start">Expense</th>
+                                    <th class="p-2 bg-primary">Category</th>
+                                    <th class="p-2 bg-primary">Description</th>
+                                    <th class="p-2 bg-primary rounded-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="col-2 bg-primary border">
+            <h4>Leader Board!</h4>
+            <ul id="leaderboard">
+                <li>Rank  Name  Total-expenses</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
 </body>
 
 <script>
@@ -78,6 +118,7 @@
 
 <script>
    
+    //Sending Add Expense request 
     let token=localStorage.getItem('token');
     function handleFormSubmit(e) {
             e.preventDefault();
@@ -98,6 +139,7 @@
 
         }
 
+        //Displaying expenses
         function addTotable(response){
             const expense = response;
             const table = document.getElementById('table');
@@ -192,7 +234,7 @@
             return input;
         }
 
-
+//Saving edit Changes
             function saveChanges(event) {
                     // Prevent the form from submitting
                     event.preventDefault();
@@ -227,13 +269,49 @@
                         });
                 }
 
+
+                //Adding leaderboard data
+                function addToleaderboard(response){
+                    let ul=document.getElementById('leaderboard');
+                    let li=document.createElement('li');
+                    li.innerHTML=`<li>${response.username}   ${response.totalExpense}s</li>`;
+                    ul.appendChild(li);
+                }
+
+                //Reloading the page
             function domload(){
+
+                //Getting and Displaying expenses data
                 axios.get(`http://localhost:3000/getExpenses`,{headers:{"Autherization":token}}).then((response) => {
                     
                      for (let i = 0; i < response.data.length; i++) {
                         addTotable(response.data[i]);
                         }
                 }).catch(err=>console.log(err));
+
+                //Getting Leaderboarddata
+                axios.get(`http://localhost:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
+
+                    for (let i = 0; i < response.data.length; i++) {
+                        addToleaderboard(response.data[i]);
+                    }
+                }).catch(err => console.log(err));
+
+                //Checking user is premium or not and displaying 
+                let button = document.getElementById('premium');
+                let d = document.getElementById('showMessage');
+                if (button && d) {
+                    let isPremium = localStorage.getItem('ispremium');
+                    if (isPremium === 'false') {
+                        button.style.display = 'block';
+                        d.style.display = 'none';
+                    } else {
+                        button.style.display = 'none';
+                        d.style.display = 'block';
+                    }
+                }
+
+
             }
 
             window.onload = function () {

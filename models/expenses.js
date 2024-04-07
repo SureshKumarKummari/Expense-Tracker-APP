@@ -24,10 +24,6 @@ const Expenses = sequelize.define('expenses', {
     userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-            model: User, // Specify the referenced model (Users)
-            key: 'id'   // Specify the referenced column (id)
-        }
     }
 });
 

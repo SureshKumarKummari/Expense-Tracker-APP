@@ -13,5 +13,7 @@ router.delete('/deleteExpense/:id',userauth.authenticate,expense.deleteExpense);
 
 router.put('/updateExpense/:id',userauth.authenticate,expense.updateExpense);
 
+router.get('/getLeaderboard',userauth.authenticate,expense.getLeaderbord);
+
 module.exports=router;
 

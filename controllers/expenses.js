@@ -1,5 +1,6 @@
 const expenseTable=require('../models/expenses');
-
+const usersTable=require('../models/users');
+const Sequelize=require('sequelize');
 
 
 exports.getExpenses = (req, res, next) => {
@@ -16,6 +17,29 @@ exports.getExpenses = (req, res, next) => {
             res.status(500).json({ error: 'Internal server error' });
         });
 };
+
+
+exports.getLeaderbord = async (req, res, next) => {
+    try {
+        console.log('fromLeaderboard!');
+        const usersExpenses = await usersTable.findAll({
+            attributes: ['username',
+            [Sequelize.fn('SUM', Sequelize.col('expense')), 'totalExpense']
+                ],
+            include:[{model:expenseTable,attributes:[]}],
+            group:['id']
+        }).then(result=>{
+            console.log(result);
+            res.status(200).json(result);
+        }).catch(err=>{
+            throw new Error(err);
+        })
+    } catch (error) {
+        console.error('Error fetching user expenses:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 
 
 exports.addExpense = (req, res, next) => {

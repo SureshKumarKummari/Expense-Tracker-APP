@@ -38,7 +38,7 @@ exports.login = (req, res, next) => {
                         if (passwordMatch) {
                             //console.log(user);
 
-                            res.status(200).json({token:generateToken(user.id)}); // Send user data if passwords match
+                            res.status(200).json({token:generateToken(user.id),ispremium:user.ispremiumuser}); // Send user data if passwords match
                         } else {
                             res.status(401).json({ error: 'Invalid Password!' }); // Unauthorized if passwords don't match
                         }
