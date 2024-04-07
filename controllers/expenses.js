@@ -1,7 +1,7 @@
 const expenseTable=require('../models/expenses');
 const usersTable=require('../models/users');
 const Sequelize=require('sequelize');
-
+const sequelize=require('../util/database');
 
 exports.getExpenses = (req, res, next) => {
     let id=req.user.id;
@@ -29,7 +29,7 @@ exports.getLeaderbord = async (req, res, next) => {
             // include:[{model:expenseTable,attributes:[]}],
             // group:['id'],
             // order:[['totalExpense','DESC']]
-            attributes:['username','totalexpenses'],
+            attributes:['username','totalexpenses','id'],
             order:[['totalexpenses','DESC']]
         
         }).then(result=>{
@@ -46,72 +46,103 @@ exports.getLeaderbord = async (req, res, next) => {
 
 
 
-exports.addExpense = (req, res, next) => {
+exports.addExpense = async (req, res, next) => {
     const obj = {
         expense: req.body.expense,
         description: req.body.description,
         category: req.body.category,
         userId: req.user.id // Assuming userId is passed in the request body
     };
-    changeexpense(obj.userId,obj.expense,'add');
-    expenseTable.create(obj)
-        .then(expense => {
-            res.status(201).json(expense); // Return the created expense record
-        })
-        .catch(error => {
-            console.error('Error adding expense:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        });
+
+    try {
+        const t = await sequelize.transaction();
+        const expense = await expenseTable.create(obj, { transaction: t });
+        await changeexpense(obj.userId, obj.expense, 'add');
+        await t.commit();
+        res.status(201).json(expense); // Return the created expense record
+    } catch (error) {
+        console.error('Error adding expense:', error);
+        await t.rollback();
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
-//Modifying totalexpense amount of use
-function changeexpense(userid,expense,operation){
-    usersTable.findByPk(userid).then(user=>{
-        if(operation==='add'){
-        user.totalexpenses=user.totalexpenses+expense;
-        }else if(operation==='update'){
-            user.totalexpenses=expense;
-        }else{
-            user.totalexpenses=user.totalexpenses-expense;
+function changeexpense(userid, expense, operation) {
+    return new Promise((resolve, reject) => {
+        usersTable.findByPk(userid)
+            .then(user => {
+                if (!user) {
+                    throw new Error('User not found');
+                }
+                if (operation === 'add') {
+                    user.totalexpenses += Number(expense);
+                } else if (operation === 'update') {
+                    user.totalexpenses = Number(expense);
+                } else if (operation === 'delete') {
+                    user.totalexpenses -= Number(expense);
+                } else {
+                    throw new Error('Invalid operation');
+                }
+                console.log(user);
+                return user.save();
+            })
+            .then(updatedUser => {
+                resolve(updatedUser);
+            })
+            .catch(err => {
+                console.error('Error in changeexpense:', err);
+                reject(err);
+            });
+    });
+}
+
+
+
+exports.deleteExpense = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const expenseToDelete = await expenseTable.findByPk(id);
+        if (!expenseToDelete) {
+            throw new Error('Expense not found');
         }
-        user.save();
-    }).catch(err=>{
-        console.log(err);
-    })
-}
 
-exports.deleteExpense=(req,res,next)=>{
-    console.log(req.params.id);
-    expenseTable.findByPk(req.params.id)
-        .then(expense => {
-            changeexpense(expense.userId,expense.expense,'delete');
-            return expense.destroy();
-        }).then(response=>{
-            res.status(200).send(response);
-        })
-        .catch(error => {
-            console.error('Error fetching expenses:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        });
-}
+        const userId = expenseToDelete.userId;
+        const expenseAmount = expenseToDelete.expense;
+        const t = await sequelize.transaction();
+
+        await changeexpense(userId, expenseAmount, 'delete', t);
+        await expenseToDelete.destroy({ transaction: t });
+        await t.commit();
+        res.status(200).json({ message: 'Expense deleted successfully' });
+    } catch (error) {
+        if (t) await t.rollback();
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 
-exports.updateExpense=(req,res,next)=>{
-    let id=req.params.id;
-    expenseTable.findByPk(id)
-    .then((expens)=>{
-        expens.expense=req.body.expense;
-        expens.category=req.body.category;
-        expens.description=req.body.description;
-        changeexpense(expens.userId,expens.expense,'update');
-        return expens.save();
-    }).then((updatedExpense) => {
-            res.status(200).json(updatedExpense); // Respond with the updated expense record
-    }).catch((error) => {
-            console.error('Error updating expense:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        });
-    
 
-}
+exports.updateExpense = async (req, res, next) => {
+    try {
+        let id = req.params.id;
+        const t = await sequelize.transaction();
+        const expenseToUpdate = await expenseTable.findByPk(id, { transaction: t });
+        if (!expenseToUpdate) {
+            throw new Error('Expense not found');
+        }
+        expenseToUpdate.expense = req.body.expense;
+        expenseToUpdate.category = req.body.category;
+        expenseToUpdate.description = req.body.description;
+
+        await changeexpense(expenseToUpdate.userId, expenseToUpdate.expense, 'update', t);
+        const updatedExpense = await expenseToUpdate.save({ transaction: t });
+        await t.commit();
+        res.status(200).json(updatedExpense); // Respond with the updated expense record
+    } catch (error) {
+        if (t) await t.rollback();
+        console.error('Error updating expense:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

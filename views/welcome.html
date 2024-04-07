@@ -131,6 +131,7 @@
             .then(response => {
                 
                 addTotable(response.data);
+                printlederboard();
 
                     })
             .catch(error => {
@@ -173,6 +174,7 @@
         axios.delete(`http://localhost:3000/deleteExpense/${id}`, { headers: { "Autherization": token } }).then((result) => {
             console.log("Expense Deleted!");
             row.remove();
+            printleaderboard();
         }).catch((error) => {
             console.log(error);
         })
@@ -257,10 +259,8 @@
                         description
                     }, { headers: { "Autherization": token } })
                         .then(response => {
-                            // Handle response as needed
                             console.log('Expense updated successfully:', response.data);
-                            // Refresh the page or update the row in the table with the new data
-                            // For simplicity, you can reload the page
+                            // Refresh the page or update the row in the table with the new data For simplicity, you can reload the page
                             location.reload();
                         })
                         .catch(error => {
@@ -271,12 +271,25 @@
 
 
                 //Adding leaderboard data
-                function addToleaderboard(response){
-                    let ul=document.getElementById('leaderboard');
-                    let li=document.createElement('li');
-                    li.innerHTML=`<li>${response.username}   ${response.totalexpenses}s</li>`;
-                    ul.appendChild(li);
-                }
+                var userids = new Map();
+
+                    function addToleaderboard(response) {
+                        let ul = document.getElementById('leaderboard');
+
+                        // Check if the user ID already exists in the map
+                        if (userids.has(response.id)) {
+                            // If the user ID exists, update the existing list item
+                            let li = userids.get(response.id);
+                            li.innerHTML = `<h5>${response.username}</h5><h6>${response.totalexpenses}</h6>`;
+                        } else {
+                            // If the user ID does not exist, create a new list item
+                            let li = document.createElement('li');
+                            li.innerHTML = `<h5>${response.username}</h5><h6>${response.totalexpenses}</h6>`;
+                            ul.appendChild(li);
+                            userids.set(response.id, li);
+                        }
+                    }
+
 
                 //Reloading the page
             function domload(){
@@ -288,14 +301,7 @@
                         addTotable(response.data[i]);
                         }
                 }).catch(err=>console.log(err));
-
-                //Getting Leaderboarddata
-                axios.get(`http://localhost:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
-
-                    for (let i = 0; i < response.data.length; i++) {
-                        addToleaderboard(response.data[i]);
-                    }
-                }).catch(err => console.log(err));
+                printleaderboard();
 
                 //Checking user is premium or not and displaying 
                 let button = document.getElementById('premium');
@@ -312,6 +318,16 @@
                 }
 
 
+            }
+
+            function printleaderboard(){
+                //Getting Leaderboarddata
+                axios.get(`http://localhost:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
+
+                    for (let i = 0; i < response.data.length; i++) {
+                        addToleaderboard(response.data[i]);
+                    }
+                }).catch(err => console.log(err));
             }
 
             window.onload = function () {
