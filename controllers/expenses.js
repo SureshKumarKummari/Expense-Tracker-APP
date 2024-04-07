@@ -23,12 +23,15 @@ exports.getLeaderbord = async (req, res, next) => {
     try {
         console.log('fromLeaderboard!');
         const usersExpenses = await usersTable.findAll({
-            attributes: ['username',
-            [Sequelize.fn('SUM', Sequelize.col('expense')), 'totalExpense']
-                ],
-            include:[{model:expenseTable,attributes:[]}],
-            group:['id'],
-            order:[['totalExpense','DESC']]
+            // attributes: ['username',
+            // [Sequelize.fn('SUM', Sequelize.col('expense')), 'totalExpense']
+            //     ],
+            // include:[{model:expenseTable,attributes:[]}],
+            // group:['id'],
+            // order:[['totalExpense','DESC']]
+            attributes:['username','totalexpenses'],
+            order:[['totalexpenses','DESC']]
+        
         }).then(result=>{
             console.log(result);
             res.status(200).json(result);
@@ -50,7 +53,7 @@ exports.addExpense = (req, res, next) => {
         category: req.body.category,
         userId: req.user.id // Assuming userId is passed in the request body
     };
-
+    changeexpense(obj.userId,obj.expense,'add');
     expenseTable.create(obj)
         .then(expense => {
             res.status(201).json(expense); // Return the created expense record
@@ -61,13 +64,27 @@ exports.addExpense = (req, res, next) => {
         });
 };
 
-
-
+//Modifying totalexpense amount of use
+function changeexpense(userid,expense,operation){
+    usersTable.findByPk(userid).then(user=>{
+        if(operation==='add'){
+        user.totalexpenses=user.totalexpenses+expense;
+        }else if(operation==='update'){
+            user.totalexpenses=expense;
+        }else{
+            user.totalexpenses=user.totalexpenses-expense;
+        }
+        user.save();
+    }).catch(err=>{
+        console.log(err);
+    })
+}
 
 exports.deleteExpense=(req,res,next)=>{
     console.log(req.params.id);
     expenseTable.findByPk(req.params.id)
         .then(expense => {
+            changeexpense(expense.userId,expense.expense,'delete');
             return expense.destroy();
         }).then(response=>{
             res.status(200).send(response);
@@ -87,6 +104,7 @@ exports.updateExpense=(req,res,next)=>{
         expens.expense=req.body.expense;
         expens.category=req.body.category;
         expens.description=req.body.description;
+        changeexpense(expens.userId,expens.expense,'update');
         return expens.save();
     }).then((updatedExpense) => {
             res.status(200).json(updatedExpense); // Respond with the updated expense record
