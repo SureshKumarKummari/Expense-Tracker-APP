@@ -15,6 +15,8 @@ router.put('/updateExpense/:id',userauth.authenticate,expense.updateExpense);
 
 router.get('/getLeaderboard',userauth.authenticate,expense.getLeaderbord);
 
+//To get expenses using pagenumber
+router.get('/getExpenses/page/:pagenumber',userauth.authenticate,expense.getExpenses);
 
 router.get('/download',userauth.authenticate,expense.download);
 

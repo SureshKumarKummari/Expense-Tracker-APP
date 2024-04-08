@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" initial-scale=1.0">
+    <meta name="viewport" initial-scale="1.0">
     <title>Document</title>
 
     <!-- Bootstrap CSS -->
@@ -19,7 +19,7 @@
     <h1 style="text-align:center">Day to Day Expenses</h1>
     <div class="container justify-content-center table-responsive" style="max-width:700px;">
         <h4></h4>
-        <table class="table">
+        <table class="table" id="expenses">
             <h4 id="year"></h4>
             <h5 id="month-year"></h5>
             <thead class="thead-light bg-primary ">
@@ -27,25 +27,36 @@
                     <th  class="p-2 bg-primary rounded-start" style="color:white">Date</th>
                     <th  class="p-2 bg-primary" style="color:white">Description</th>
                     <th  class="p-2 bg-primary" style="color:white">Category</th>
-                    <th  class="p-2 bg-primary"style="color:white">Inome</th>
+                    <!-- <th  class="p-2 bg-primary"style="color:white">Inome</th> -->
                     <th  class="p-2 bg-primary rounded-end" style="color:white">Expense</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>ok</td>
-                </tr>
+            <tbody id="addExpenses">
+                
             </tbody>
         </table>
-        <!-- <div style="text-align:center">
         <br>
-    <button type="submit" class="mt-4" style="text-align:center">Generate
-        Report</button>
-        </div> -->
+        <div>
+            <nav aria-label="...">
+                <ul class="pagination justify-content-end" id="pagination">
+                    <li class="page-item" id="first" name="1">
+                        <button class="page-link" tabindex="-1" onclick="handlepagination(this.parentNode)">First</button>
+                    </li>
+                    <li class="page-item" id="prev" name="0">
+                        <button class="page-link"  onclick="handlepagination(this.parentNode)">Prev</button>
+                    </li>
+                    <li class="page-item active" id="current" name="1">
+                        <a class="page-link">1 <span class="sr-only"></span></a>
+                    </li>
+                    <li class="page-item" id="next" name="2">
+                        <button class="page-link" onclick="handlepagination(this.parentNode)">Next</button>
+                    </li>
+                    <li class="page-item" id="last" name="2">
+                        <button class="page-link" onclick="handlepagination(this.parentNode)">Last</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <br><br>
@@ -56,26 +67,21 @@
             <thead class="thead-light bg-primary ">
                 <tr>
                     <th class="p-2 bg-primary rounded-start" style="color:white">Month</th>
-                    <th class="p-2 bg-primary" style="color:white">Income</th>
-                    <th class="p-2 bg-primary" style="color:white">Expense</th>
-                    <th class="p-2 bg-primary rounded-end" style="color:white">Savings</th>
+                    <!-- <th class="p-2 bg-primary" style="color:white">Income</th> -->
+                    <th class="p-2 bg-primary rounded-end" style="color:white">Expense</th>
+                    <!-- <th class="p-2 bg-primary rounded-end" style="color:white">Savings</th> -->
                 </tr>
             </thead>
             <tbody id="table-body">
 
             </tbody>
         </table>
-        <!-- <div style="text-align:center">
-        <br>
-        <button type="submit" class="mt-4" style="text-align:center">Generate
-            Report</button>
-            </div> -->
     </div>
 
     <br><br>
 
     <div class="container justify-content-center table-responsive" style="max-width:700px;">
-        <table id="table" class="table">
+        <!-- <table id="table" class="table">
             <h4 style="text-align:center">Notes Report</h4>
             <thead class="thead-light bg-primary ">
                 <tr>
@@ -86,7 +92,7 @@
             <tbody id="table-body">
 
             </tbody>
-        </table>
+        </table> -->
     <div style="text-align:center">
         <br>
         <br>
@@ -108,12 +114,6 @@
         let token=localStorage.getItem('token');
         await axios.get("http://localhost:3000/download", { headers: { "Autherization": token } })
         .then(res=>{
-            //let url=res.data.fileurl;
-           // console.log(res);
-            //let a=document.createElement("a");
-            //a.href=`${url}`;
-            //a.click();
-
             for(let i=0;i<res.data.length;i++){
                 displayUrls(res.data[i]);
             }
@@ -139,17 +139,122 @@
             const year = date.getFullYear();
             const month = ('0' + (date.getMonth() + 1)).slice(-2); // Months are zero-based
             const day = ('0' + date.getDate()).slice(-2);
-
             // Extract hours, minutes, and seconds
             const hours = ('0' + date.getHours()).slice(-2);
             const minutes = ('0' + date.getMinutes()).slice(-2);
             const seconds = ('0' + date.getSeconds()).slice(-2);
-
             // Construct the formatted date string
             const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
             return formattedDate;
         }
+
+        window.onload = function () {
+                   getexpensepage(1);
+                }
+                function getexpensepage(pagenumber){
+
+
+                     const token = localStorage.getItem('token');
+                    axios.get(`http://localhost:3000/getExpenses/page/${pagenumber}`, { headers: { "Autherization": token } }).then((response) => {
+                        
+                        document.getElementById("addExpenses").innerHTML='';
+                        for (let i = 0; i < response.data.length-1; i++) {
+                            addTotable(response.data[i]);
+                        }
+                        if(pagenumber==1){
+                            let lastpagenumber = response.data[response.data.length-1].lastpagenumber;
+                            document.getElementById("last").querySelector('button').innerHTML=`${lastpagenumber}`;
+                            document.getElementById("last").setAttribute("name",`${lastpagenumber}`);
+                             document.getElementById("prev").style.display = 'none';
+                            document.getElementById("first").style.display = 'none';
+                            if(lastpagenumber===1){
+                                document.getElementById("next").style.display = 'none';
+                                document.getElementById("last").style.display = 'none';
+                            }
+                        }
+                    }).catch(err => console.log(err));
+                }
+
+
+
+                 function addTotable(response) {
+                    const expense = response;
+                    const table = document.getElementById('expenses');
+                    const tbody = document.getElementById('addExpenses');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                <td class="rounded-start">${dateGenerated(expense.createdAt)}</td>
+                <td>${expense.description}</td>
+                <td>${expense.category}</td>
+                <td class="rounded-end">${expense.expense}</td`;
+
+                    tbody.appendChild(tr);
+
+                    table.appendChild(tbody);
+                }
+
+
+                function handlepagination(element){
+                    const id=element.getAttribute('id');
+                    const pagetogo=Number(element.getAttribute('name'));
+                    const lastpagenumber=Number(document.getElementById("last").getAttribute('name'));
+                    const currentpagenumber=Number(document.getElementById("current").getAttribute('name'));
+
+
+                    document.getElementById("current").setAttribute('name', `${pagetogo}`);
+                    document.getElementById("current").querySelector('a').innerHTML = `${pagetogo}`;
+
+                    if(id==='next'){
+                        let prev = document.getElementById("prev");
+                        prev.style.display = 'block';
+                        prev.setAttribute('name', `${currentpagenumber}`);
+                        document.getElementById("first").style.display = 'block';
+                        if(pagetogo<lastpagenumber){
+                            getexpensepage(pagetogo);
+                            document.getElementById("last").style.display = 'block';
+                            document.getElementById("next").style.display = 'block';
+                            document.getElementById(id).setAttribute("name",`${pagetogo+1}`)
+                        }else if(pagetogo==lastpagenumber){
+                            getexpensepage(pagetogo);
+                             document.getElementById("next").style.display = 'none';
+                            document.getElementById("last").style.display = 'none';
+                        }
+
+                    }else if(id==='prev'){
+
+                        let prev = document.getElementById("next");
+                        prev.style.display = 'block';
+                        prev.setAttribute('name', `${currentpagenumber}`);
+                        document.getElementById("last").style.display = 'block';
+                        if (pagetogo > 1) {
+                            getexpensepage(pagetogo);
+                            document.getElementById(id).setAttribute("name", `${pagetogo - 1}`)
+                        } else if (pagetogo == 1) {
+                            getexpensepage(pagetogo);
+                            document.getElementById("prev").style.display = 'none';
+                            document.getElementById("first").style.display = 'none';
+                        }
+
+                    }else if(id=='last'){
+                        document.getElementById("prev").style.display = 'block';
+                        document.getElementById("first").style.display = 'block';
+                        document.getElementById("last").style.display = 'none';
+                        document.getElementById("next").style.display = 'none';
+                        document.getElementById("prev").setAttribute("name", `${pagetogo - 1}`);
+
+                        getexpensepage(pagetogo);
+                    }else{
+                        document.getElementById("prev").style.display = 'none';
+                        document.getElementById("first").style.display = 'none';
+                        document.getElementById("last").style.display = 'block';
+                        document.getElementById("next").style.display = 'block';
+                        document.getElementById("next").setAttribute("name", `${pagetogo + 1}`);
+                        getexpensepage(pagetogo);   
+                    }
+
+                }
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 

@@ -7,8 +7,30 @@ const fileurls=require('../models/fileurls');
 //getting uploadaws
 const uploadtoaws=require('../util/uploadingtoaws');
 
-exports.getExpenses = (req, res, next) => {
+exports.getExpenses = async(req, res, next) => {
     let id=req.user.id;
+    if(req.params.pagenumber){
+        //const start=(req.params.pagenumber-1)*10;
+        //const end=start+11;
+        const page = req.params.pagenumber || 1;
+        const limit = 10;
+        const offset = (page - 1) * limit;
+        try {
+            const expenses = await expenseTable.findAll({
+                offset,
+                limit,
+                order: [['createdAt', 'DESC']]
+            });
+            let count=await expenseTable.count();
+            let totalpages=Math.ceil(count/limit);
+            expense=[...expenses,{lastpagenumber:totalpages}];
+            res.status(200).json(expense);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+    }else{
     expenseTable.findAll({where:{userId:id}})
         .then(expenses => {
             //console.log(expenses);
@@ -20,6 +42,7 @@ exports.getExpenses = (req, res, next) => {
             console.error('Error fetching expenses:', error);
             res.status(500).json({ error: 'Internal server error' });
         });
+    }
 };
 
 

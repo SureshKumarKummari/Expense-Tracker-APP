@@ -37,7 +37,7 @@
                     <div id="showMessage" class="nav-link">You are Premium member</div>
                 </li>
                 <li class="nav-item">
-                    <button type="button" class="btn btn-link nav-link" id="seereport">Check All Expenses data</button>
+                    <a href="day-to-day-expenses.html" class="nav-link">See Reports</a>
                 </li>
             </ul>
         </div>
@@ -253,8 +253,6 @@
                     const description = form.querySelector('input[name="description"]').value;
                     const expenseId = form.querySelector('input[name="expenseId"]').value;
 
-                    // Perform validation if needed
-
                     // Send data to the server using Axios
                     axios.put(`http://localhost:3000/updateExpense/${expenseId}`, {
                         expense,
@@ -373,11 +371,6 @@
                 }
                 
 
-
-                //Handling getReport button
-                document.getElementById('seereport').onclick=async()=>{
-                    window.location.href='day-to-day-expenses.html';
-                }
 
 </script>
 
