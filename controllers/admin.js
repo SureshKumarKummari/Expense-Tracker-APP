@@ -103,7 +103,7 @@ exports.resetPassword=(req,res,next)=>{
     res.render('resetpassword',{id:id});
 }
 
-
+//Need to check isactive  -- pending
 exports.updatePassword = async (req, res, next) => {
     const { id, password } = req.body;
     try {
