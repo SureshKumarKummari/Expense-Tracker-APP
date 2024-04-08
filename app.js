@@ -4,6 +4,7 @@ const expenses=require('./models/expenses');
 const users=require('./models/users');
 const orders=require('./models/orders');
 const forgotpassword=require('./models/forgotpasswordrequests');
+const fileurls=require('./models/fileurls');
 
 //Routers
 const admin=require('./routes/admin');
@@ -48,6 +49,8 @@ orders.belongsTo(users);
 users.hasMany(forgotpassword);
 forgotpassword.belongsTo(users);
 
+users.hasMany(fileurls);
+fileurls.belongsTo(users);
 
 sequelize.sync().then(()=>{
 app.listen(3000,()=>{

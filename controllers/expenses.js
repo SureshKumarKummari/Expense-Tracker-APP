@@ -2,6 +2,10 @@ const expenseTable=require('../models/expenses');
 const usersTable=require('../models/users');
 const Sequelize=require('sequelize');
 const sequelize=require('../util/database');
+const fileurls=require('../models/fileurls');
+
+//getting uploadaws
+const uploadtoaws=require('../util/uploadingtoaws');
 
 exports.getExpenses = (req, res, next) => {
     let id=req.user.id;
@@ -144,5 +148,39 @@ exports.updateExpense = async (req, res, next) => {
         if (t) await t.rollback();
         console.error('Error updating expense:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+
+
+exports.download = async (req, res, next) => {
+    try {
+        // Retrieve expenses for the user
+        const expenses = await req.user.getExpenses();
+        const stringifiedExpenses = JSON.stringify(expenses);
+
+        // Upload expenses to S3
+        const filename = "Expense3.txt";
+        const fileUrl = await uploadtoaws.uploadtoS3(stringifiedExpenses, filename);
+
+        // Save file URL to database
+        await fileurls.create({
+            link: fileUrl,
+            userId: req.user.id,
+        });
+
+        // Retrieve all file URLs for the user
+        const allUrls = await fileurls.findAll({
+            attributes: ['link', 'createdAt'],
+            where: { userId: req.user.id },
+            raw: true // Add this option to return raw data objects
+        });
+        console.log(allUrls);
+        // Send response with list of file URLs
+        res.status(200).json( allUrls );
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
     }
 };

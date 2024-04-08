@@ -15,5 +15,8 @@ router.put('/updateExpense/:id',userauth.authenticate,expense.updateExpense);
 
 router.get('/getLeaderboard',userauth.authenticate,expense.getLeaderbord);
 
+
+router.get('/download',userauth.authenticate,expense.download);
+
 module.exports=router;
 
