@@ -39,6 +39,18 @@
         <div>
             <nav aria-label="...">
                 <ul class="pagination justify-content-end" id="pagination">
+                    
+                    <li>
+                        <h6>No of items per Page:
+                            <select id="select" style="margin-right: 20px; padding:6px;">
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
+                        </h6>
+                    </li>
+
                     <li class="page-item" id="first" name="1">
                         <button class="page-link" tabindex="-1" onclick="handlepagination(this.parentNode)">First</button>
                     </li>
@@ -150,13 +162,14 @@
         }
 
         window.onload = function () {
-                   getexpensepage(1);
+                   getexpensepage(1,10);
+                   localStorage.setItem('itemsperpage',10);
                 }
-                function getexpensepage(pagenumber){
+                function getexpensepage(pagenumber,itemsperpage){
 
 
                      const token = localStorage.getItem('token');
-                    axios.get(`http://localhost:3000/getExpenses/page/${pagenumber}`, { headers: { "Autherization": token } }).then((response) => {
+                    axios.get(`http://localhost:3000/getExpenses/page/${pagenumber}/${itemsperpage}`, { headers: { "Autherization": token } }).then((response) => {
                         
                         document.getElementById("addExpenses").innerHTML='';
                         for (let i = 0; i < response.data.length-1; i++) {
@@ -196,6 +209,7 @@
 
 
                 function handlepagination(element){
+                    let itemsperpage=localStorage.getItem('itemsperpage');
                     const id=element.getAttribute('id');
                     const pagetogo=Number(element.getAttribute('name'));
                     const lastpagenumber=Number(document.getElementById("last").getAttribute('name'));
@@ -211,12 +225,12 @@
                         prev.setAttribute('name', `${currentpagenumber}`);
                         document.getElementById("first").style.display = 'block';
                         if(pagetogo<lastpagenumber){
-                            getexpensepage(pagetogo);
+                            getexpensepage(pagetogo,itemsperpage);
                             document.getElementById("last").style.display = 'block';
                             document.getElementById("next").style.display = 'block';
                             document.getElementById(id).setAttribute("name",`${pagetogo+1}`)
                         }else if(pagetogo==lastpagenumber){
-                            getexpensepage(pagetogo);
+                            getexpensepage(pagetogo,itemsperpage);
                              document.getElementById("next").style.display = 'none';
                             document.getElementById("last").style.display = 'none';
                         }
@@ -228,10 +242,10 @@
                         prev.setAttribute('name', `${currentpagenumber}`);
                         document.getElementById("last").style.display = 'block';
                         if (pagetogo > 1) {
-                            getexpensepage(pagetogo);
+                            getexpensepage(pagetogo,itemsperpage);
                             document.getElementById(id).setAttribute("name", `${pagetogo - 1}`)
                         } else if (pagetogo == 1) {
-                            getexpensepage(pagetogo);
+                            getexpensepage(pagetogo,itemsperpage);
                             document.getElementById("prev").style.display = 'none';
                             document.getElementById("first").style.display = 'none';
                         }
@@ -243,17 +257,24 @@
                         document.getElementById("next").style.display = 'none';
                         document.getElementById("prev").setAttribute("name", `${pagetogo - 1}`);
 
-                        getexpensepage(pagetogo);
+                        getexpensepage(pagetogo,itemsperpage);
                     }else{
                         document.getElementById("prev").style.display = 'none';
                         document.getElementById("first").style.display = 'none';
                         document.getElementById("last").style.display = 'block';
                         document.getElementById("next").style.display = 'block';
                         document.getElementById("next").setAttribute("name", `${pagetogo + 1}`);
-                        getexpensepage(pagetogo);   
+                        getexpensepage(pagetogo,itemsperpage);   
                     }
 
                 }
+
+                const selectElement = document.getElementById('select');
+                    selectElement.addEventListener('change', function (event) {
+                        const selectedOption = event.target.value;
+                        localStorage.setItem('itemsperpage', selectedOption);
+                        getexpensepage(1,localStorage.getItem('itemsperpage'));
+                    });
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

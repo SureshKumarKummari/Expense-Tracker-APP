@@ -13,7 +13,8 @@ exports.getExpenses = async(req, res, next) => {
         //const start=(req.params.pagenumber-1)*10;
         //const end=start+11;
         const page = req.params.pagenumber || 1;
-        const limit = 10;
+        const limit = Number(req.params.itemsperpage);
+        console.log(page,limit);
         const offset = (page - 1) * limit;
         try {
             const expenses = await expenseTable.findAll({
