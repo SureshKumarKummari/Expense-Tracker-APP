@@ -6,6 +6,15 @@ const orders=require('./models/orders');
 const forgotpassword=require('./models/forgotpasswordrequests');
 const fileurls=require('./models/fileurls');
 
+//Middlewares
+const helmet=require('helmet');
+const morgan=require('morgan');
+
+//base modules
+const fs=require('fs');
+
+require('dotenv').config();
+
 //Routers
 const admin=require('./routes/admin');
 const handleexpenses=require('./routes/expenses');
@@ -27,7 +36,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.set('view engine', 'ejs');
 
+app.use(helmet());
 
+const accessLogstream=fs.createWriteStream(
+    path.join(__dirname,'access.log'),
+    {flags:'a'}
+);
+app.use(morgan('combined',{stream:accessLogstream}))
 
 
 app.use(cors());
