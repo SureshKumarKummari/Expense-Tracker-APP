@@ -67,9 +67,10 @@ forgotpassword.belongsTo(users);
 users.hasMany(fileurls);
 fileurls.belongsTo(users);
 
+const port=process.env.PORT || 3000;
 sequelize.sync().then(()=>{
-app.listen(3000,()=>{
-    console.log("App listening on PORT 3000!")
+app.listen(port,()=>{
+    console.log(`App listening on PORT ${port}!`)
 })
 }).catch(err=>console.log(err));
 
