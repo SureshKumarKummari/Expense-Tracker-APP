@@ -98,12 +98,22 @@ exports.forgotPassword = async (req, res, next) => {
 
 
 
-exports.resetPassword=(req,res,next)=>{
+exports.resetPassword=async(req,res,next)=>{
+    try{
     let id=req.params.id;
-    res.render('resetpassword',{id:id});
+        const urldata=await forgot.findByPk(id)
+        if(urldata.isactive){
+            res.render('resetpassword',{id:id});
+        }else{
+            res.render(`<html><body><h1>The Link for Resetting password has been Expired! please generate Newone To update password!</h1></html></body>`);
+        }
+    }catch(err){
+        console.error("Error in Resetting password:", error);
+        res.status(500).json({ error: "Internal Server error!" });
+    }
 }
 
-//Need to check isactive  -- pending
+//updating password
 exports.updatePassword = async (req, res, next) => {
     const { id, password } = req.body;
     try {

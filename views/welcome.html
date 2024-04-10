@@ -22,22 +22,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+        <style>
+            .vertical-window {
+                border-radius: 15px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                height: 100%;
+            }
+            .container, .col-8, .col-4 {
+      height: 100%;
+    }
+        </style>
 </head>
 
 <body class="bg-info">
     <!-- Nav Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Expense Tracker App</a>
+    <nav class="navbar navbar-expand-lg bg-primary" >
+        <b class="navbar-brand" style="color:yellow">Expense Tracker App</b>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <button type="button" class="btn btn-link nav-link" id="premium">Buy premium</button>
+                    <button type="button" class="btn btn-link nav-link" id="premium" style="display:none; color: white;">Buy premium</button>
                 </li>
                 <li class="nav-item">
-                    <div id="showMessage" class="nav-link">You are Premium member</div>
+                    <div id="showMessage" class="nav-link" style="display:none; color: white;">You are Premium member</div>
                 </li>
                 <li class="nav-item">
-                    <a href="day-to-day-expenses.html" class="nav-link">See Reports</a>
+                    <a href="day-to-day-expenses.html" id="seereportspage"class="nav-link" style="display:none; color: white;">See Reports</a>
                 </li>
             </ul>
         </div>
@@ -51,10 +63,15 @@
             <h1>Filters</h1>
 
         </div> -->
-        <div class="col-8">
-            <div class="row" style="height: 100%;">
-                <div class="col bg-secondary border">
-                    <h4>Add Expense details</h4>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-8">
+                    <div class="vertical-window bg-light d1">
+
+                    <br>
+                    <h4 style="text-align:center;color:grey">Add Expense details</h4>
+                    <br>
                     <div class="container justify-content-center">
                         <form onsubmit="handleFormSubmit(event)" class="row g-3">
                             <div class="col-md-4">
@@ -85,10 +102,10 @@
                         <table id="table" class="table">
                             <thead class="thead-light bg-primary ">
                                 <tr>
-                                    <th class="p-2 bg-primary rounded-start">Expense</th>
-                                    <th class="p-2 bg-primary">Category</th>
-                                    <th class="p-2 bg-primary">Description</th>
-                                    <th class="p-2 bg-primary rounded-end">Actions</th>
+                                    <th class="p-2 bg-primary rounded-start" style="color:white">Expense</th>
+                                    <th class="p-2 bg-primary" style="color:white">Category</th>
+                                    <th class="p-2 bg-primary" style="color:white">Description</th>
+                                    <th class="p-2 bg-primary rounded-end" style="color:white">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body"></tbody>
@@ -96,30 +113,29 @@
                     </div>
 
 
-                </div>
+        </div>
+        </div>
+
+        <div class="col-4">
+            <div class="vertical-window bg-light">
+            <h3 style="text-align :center; color:grey">Leader Board</h3>
+            <ul id="leaderboard" style="list-style-type: none;" >
+                        <li><b style="display: inline-block;width:100px;">Rank</b>
+                            <b style="display: inline-block;width:150px;">Name</b>
+                            <b style="display: inline-block;width:100px;">Totalexpenses</b>
+                        </li>
+            </ul>
             </div>
         </div>
-        <div class="col-4 bg-primary border">
-            <h4>Leader Board!</h4>
-            <ul id="leaderboard">
-                <li>Rank  Name  Total-expenses</li>
-            </ul>
+
+        </div>
         </div>
     </div>
 </div>
 
 
 </body>
-
-<script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
-
-
-<script>
+ <script>
    
     //Sending Add Expense request 
     let token=localStorage.getItem('token');
@@ -274,18 +290,22 @@
                 //Adding leaderboard data
                 var userids = new Map();
 
-                    function addToleaderboard(response) {
+                    function addToleaderboard(response,i) {
                         let ul = document.getElementById('leaderboard');
 
                         // Check if the user ID already exists in the map
                         if (userids.has(response.id)) {
                             // If the user ID exists, update the existing list item
                             let li = userids.get(response.id);
-                            li.innerHTML = `<h5>${response.username}</h5><h6>${response.totalexpenses}</h6>`;
+                            li.innerHTML = `<li><p style="display: inline-block;width:100px;">${i}</p>
+                            <p style="display: inline-block;width:150px;">${response.username}</p>
+                            <p style="display: inline-block;width:100px;">${response.totalexpenses}</p></li>`;
                         } else {
                             // If the user ID does not exist, create a new list item
                             let li = document.createElement('li');
-                            li.innerHTML = `<h5>${response.username}</h5><h6>${response.totalexpenses}</h6>`;
+                            li.innerHTML = `<li><p style="display: inline-block;width:100px;">${i}</p>
+                            <p style="display: inline-block;width:150px;">${response.username}</p>
+                            <p style="display: inline-block;width:100px;">${response.totalexpenses}</p></li>`;
                             ul.appendChild(li);
                             userids.set(response.id, li);
                         }
@@ -302,31 +322,31 @@
                         addTotable(response.data[i]);
                         }
                 }).catch(err=>console.log(err));
-                printleaderboard();
 
                 //Checking user is premium or not and displaying 
                 let button = document.getElementById('premium');
                 let d = document.getElementById('showMessage');
-                if (button && d) {
+                let link=document.getElementById('seereportspage');
                     let isPremium = localStorage.getItem('ispremium');
-                    if (isPremium === 'false') {
-                        button.style.display = 'block';
-                        d.style.display = 'none';
-                    } else {
-                        button.style.display = 'none';
+                    if (isPremium=='true') {
+                        //button.style.display = 'block';
                         d.style.display = 'block';
+                        link.style.display='block';
+                        printleaderboard();
+                    } else {
+                        button.style.display = 'block';
+                        //d.style.display = 'block';
                     }
-                }
-
 
             }
 
             function printleaderboard(){
+
                 //Getting Leaderboarddata
                 axios.get(`http://localhost:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
 
                     for (let i = 0; i < response.data.length; i++) {
-                        addToleaderboard(response.data[i]);
+                        addToleaderboard(response.data[i],i+1);
                     }
                 }).catch(err => console.log(err));
             }
@@ -350,6 +370,9 @@
                                 { headers: { "Autherization": token } }
                             );
                             alert('you are premium member now!');
+                            localStorage.setItem('ispremium',true);
+                            domload();
+
                         }
                     };
                     console.log(options);

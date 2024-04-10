@@ -7,11 +7,10 @@ const fileurls=require('../models/fileurls');
 //getting uploadaws
 const uploadtoaws=require('../util/uploadingtoaws');
 
+
 exports.getExpenses = async(req, res, next) => {
     let id=req.user.id;
     if(req.params.pagenumber){
-        //const start=(req.params.pagenumber-1)*10;
-        //const end=start+11;
         const page = req.params.pagenumber || 1;
         const limit = Number(req.params.itemsperpage);
         console.log(page,limit);
@@ -185,7 +184,7 @@ exports.download = async (req, res, next) => {
         const stringifiedExpenses = JSON.stringify(expenses);
 
         // Upload expenses to S3
-        const filename = "Expense3.txt";
+        const filename ="Expensesreport"+getdate()+".txt";
         const fileUrl = await uploadtoaws.uploadtoS3(stringifiedExpenses, filename);
 
         // Save file URL to database
@@ -208,3 +207,20 @@ exports.download = async (req, res, next) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+
+
+function getdate(){
+    const currentDate = new Date();
+
+        // Get individual date components
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        const hours = String(currentDate.getHours()).padStart(2, '0');
+        const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+        const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+        return formattedDate; // Output: "2024-04-05-10-30-15" (for example)
+}

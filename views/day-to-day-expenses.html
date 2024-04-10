@@ -15,7 +15,7 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body class="bg-info">
     <h1 style="text-align:center">Day to Day Expenses</h1>
     <div class="container justify-content-center table-responsive" style="max-width:700px;">
         <h4></h4>
@@ -160,10 +160,23 @@
 
             return formattedDate;
         }
-
+         localStorage.setItem('itemsperpage', 10);
         window.onload = function () {
-                   getexpensepage(1,10);
-                   localStorage.setItem('itemsperpage',10);
+
+            document.getElementById("first").setAttribute("name", "1");
+            document.getElementById("prev").setAttribute("name", "0");
+            document.getElementById("current").setAttribute("name", "1");
+            document.getElementById("next").setAttribute("name", "2");
+            document.getElementById("last").setAttribute("name", "2");
+            document.getElementById("current").querySelector("a").textContent = "1";
+            document.getElementById("first").style.display='block';
+            document.getElementById("prev").style.display = 'block';
+            document.getElementById("current").style.display = 'block';
+            document.getElementById("next").style.display = 'block';
+            document.getElementById("last").style.display = 'block';
+                   getexpensepage(1,localStorage.getItem('itemsperpage'));
+                   //localStorage.setItem('itemsperpage', 10);
+
                 }
                 function getexpensepage(pagenumber,itemsperpage){
 
@@ -273,7 +286,8 @@
                     selectElement.addEventListener('change', function (event) {
                         const selectedOption = event.target.value;
                         localStorage.setItem('itemsperpage', selectedOption);
-                        getexpensepage(1,localStorage.getItem('itemsperpage'));
+                        //getexpensepage(1,localStorage.getItem('itemsperpage'));
+                        window.onload();
                     });
 
 </script>
