@@ -94,7 +94,7 @@ exports.forgotPassword = async (req, res, next) => {
       userId: user.id,
       isactive: true,
     });
-    let link = `http://18.207.190.237:3000/password/resetpassword/${id}`;
+    let link = `http://54.144.212.125:3000/password/resetpassword/${id}`;
 
     await sendEmail.sendEmail(email, link);
 

@@ -124,7 +124,7 @@
 <script>
     document.getElementById('download').onclick=async()=>{
         let token=localStorage.getItem('token');
-        await axios.get("http://18.207.190.237:3000/download", { headers: { "Autherization": token } })
+        await axios.get("http://54.144.212.125:3000/download", { headers: { "Autherization": token } })
         .then(res=>{
             for(let i=0;i<res.data.length;i++){
                 displayUrls(res.data[i]);
@@ -182,7 +182,7 @@
 
 
                      const token = localStorage.getItem('token');
-                    axios.get(`http://18.207.190.237:3000/getExpenses/page/${pagenumber}/${itemsperpage}`, { headers: { "Autherization": token } }).then((response) => {
+                    axios.get(`http://54.144.212.125:3000/getExpenses/page/${pagenumber}/${itemsperpage}`, { headers: { "Autherization": token } }).then((response) => {
                         
                         document.getElementById("addExpenses").innerHTML='';
                         for (let i = 0; i < response.data.length-1; i++) {
