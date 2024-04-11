@@ -146,7 +146,7 @@
                 description: e.target.description.value,
                 category: e.target.category.value,
             }
-        axios.post('http://localhost:3000/addExpense',obj, { headers: { "Autherization": token } })
+        axios.post('http://18.207.190.237:3000/addExpense',obj, { headers: { "Autherization": token } })
             .then(response => {
                 
                 addTotable(response.data);
@@ -190,7 +190,7 @@
         const row = event.target.closest('tr');
         let id= row.querySelector('input[type="hidden"]').value;
         console.log(id);
-        axios.delete(`http://localhost:3000/deleteExpense/${id}`, { headers: { "Autherization": token } }).then((result) => {
+        axios.delete(`http://18.207.190.237:3000/deleteExpense/${id}`, { headers: { "Autherization": token } }).then((result) => {
             console.log("Expense Deleted!");
             row.remove();
             printleaderboard();
@@ -270,7 +270,7 @@
                     const expenseId = form.querySelector('input[name="expenseId"]').value;
 
                     // Send data to the server using Axios
-                    axios.put(`http://localhost:3000/updateExpense/${expenseId}`, {
+                    axios.put(`http://18.207.190.237:3000/updateExpense/${expenseId}`, {
                         expense,
                         category,
                         description
@@ -316,7 +316,7 @@
             function domload(){
 
                 //Getting and Displaying expenses data
-                axios.get(`http://localhost:3000/getExpenses`,{headers:{"Autherization":token}}).then((response) => {
+                axios.get(`http://18.207.190.237:3000/getExpenses`,{headers:{"Autherization":token}}).then((response) => {
                     
                      for (let i = 0; i < response.data.length; i++) {
                         addTotable(response.data[i]);
@@ -343,7 +343,7 @@
             function printleaderboard(){
 
                 //Getting Leaderboarddata
-                axios.get(`http://localhost:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
+                axios.get(`http://18.207.190.237:3000/getLeaderboard`, { headers: { "Autherization": token } }).then((response) => {
 
                     for (let i = 0; i < response.data.length; i++) {
                         addToleaderboard(response.data[i],i+1);
@@ -357,13 +357,13 @@
 
 
                 document.getElementById('premium').onclick=async()=>{
-                    const response=await axios.get('http://localhost:3000/premiummembership', { headers: { "Autherization": token } });
+                    const response=await axios.get('http://18.207.190.237:3000/premiummembership', { headers: { "Autherization": token } });
                     console.log(response);
                     var options={
                         "key_id": response.data.key_id,
                         "order_id":response.data.order.id,
                         "handler": async function(response){
-                            await axios.post('http://localhost:3000/transactionupdate',{
+                            await axios.post('http://18.207.190.237:3000/transactionupdate',{
                                 order_id:options.order_id,
                                 payment_id:response.razorpay_payment_id,
                                 status:"SUCCESSFUL"},
@@ -381,7 +381,7 @@
                     e.preventDefault();
                     rzp.on('payment.failed',function(response){
                         /* console.log(response);*/
-                        axios.post('http://localhost:3000/transactionupdate', {
+                        axios.post('http://18.207.190.237:3000/transactionupdate', {
                             order_id: options.order_id,
                             payment_id: response.razorpay_payment_id,
                             status: "FAILED"
